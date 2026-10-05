@@ -8,6 +8,9 @@ from .subject import Subject
 from .teacher_subject import TeacherSubject
 from .student_parent import StudentParent
 from .enrollment import Enrollment
+from .exam import Exam
+from .result import Result
+from .attendance import Attendance
 
 __all__ = [
     "User",
@@ -20,4 +23,7 @@ __all__ = [
     "TeacherSubject",
     "StudentParent",
     "Enrollment",
+    "Exam",
+    "Result",
+    "Attendance",
 ]
