@@ -11,6 +11,8 @@ from .enrollment import Enrollment
 from .exam import Exam
 from .result import Result
 from .attendance import Attendance
+from .fee_structure import FeeStructure
+from .payment import Payment
 
 __all__ = [
     "User",
@@ -26,4 +28,6 @@ __all__ = [
     "Exam",
     "Result",
     "Attendance",
+    "FeeStructure",
+    "Payment",
 ]
