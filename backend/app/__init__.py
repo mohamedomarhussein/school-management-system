@@ -26,6 +26,9 @@ def create_app():
         }
     )
 
+    # Load all database models
+    from . import models
+
     @app.route("/")
     def home():
         return jsonify({
