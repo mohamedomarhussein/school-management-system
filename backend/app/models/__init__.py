@@ -4,6 +4,8 @@ from .teacher import Teacher
 from .parent import Parent
 from .school_class import SchoolClass
 from .stream import Stream
+from .subject import Subject
+from .teacher_subject import TeacherSubject
 
 __all__ = [
     "User",
@@ -12,4 +14,6 @@ __all__ = [
     "Parent",
     "SchoolClass",
     "Stream",
+    "Subject",
+    "TeacherSubject",
 ]
