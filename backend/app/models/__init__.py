@@ -13,6 +13,9 @@ from .result import Result
 from .attendance import Attendance
 from .fee_structure import FeeStructure
 from .payment import Payment
+from .timetable import Timetable
+from .announcement import Announcement
+from .notification import Notification
 
 __all__ = [
     "User",
@@ -30,4 +33,7 @@ __all__ = [
     "Attendance",
     "FeeStructure",
     "Payment",
+    "Timetable",
+    "Announcement",
+    "Notification",
 ]

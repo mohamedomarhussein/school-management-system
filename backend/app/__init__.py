@@ -26,8 +26,12 @@ def create_app():
         }
     )
 
-    # Load all database models
+    # Load database models
     from . import models
+
+    # Register routes
+    from .routes.auth import auth_bp
+    app.register_blueprint(auth_bp)
 
     @app.route("/")
     def home():
