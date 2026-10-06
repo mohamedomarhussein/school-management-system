@@ -4,7 +4,10 @@ from app.extensions import db
 class SchoolClass(db.Model):
     __tablename__ = "classes"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     name = db.Column(
         db.String(100),
@@ -15,6 +18,11 @@ class SchoolClass(db.Model):
     description = db.Column(
         db.String(255),
         nullable=True
+    )
+
+    level = db.Column(
+        db.String(50),
+        nullable=False
     )
 
     streams = db.relationship(
@@ -33,5 +41,6 @@ class SchoolClass(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description
+            "description": self.description,
+            "level": self.level
         }

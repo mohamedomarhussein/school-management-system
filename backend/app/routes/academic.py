@@ -27,18 +27,64 @@ academic_bp = Blueprint(
 # CLASSES
 # ============================================================
 
+CLASS_LEVELS = {
+    "PP1": "Pre-Primary",
+    "PP2": "Pre-Primary",
+    "Grade 1": "Primary",
+    "Grade 2": "Primary",
+    "Grade 3": "Primary",
+    "Grade 4": "Primary",
+    "Grade 5": "Primary",
+    "Grade 6": "Primary",
+    "Grade 7": "Junior Secondary",
+    "Grade 8": "Junior Secondary",
+    "Grade 9": "Junior Secondary",
+    "Grade 10": "Senior Secondary",
+    "Grade 11": "Senior Secondary",
+    "Grade 12": "Senior Secondary",
+}
+
+CLASS_ORDER = {
+    "PP1": 1,
+    "PP2": 2,
+    "Grade 1": 3,
+    "Grade 2": 4,
+    "Grade 3": 5,
+    "Grade 4": 6,
+    "Grade 5": 7,
+    "Grade 6": 8,
+    "Grade 7": 9,
+    "Grade 8": 10,
+    "Grade 9": 11,
+    "Grade 10": 12,
+    "Grade 11": 13,
+    "Grade 12": 14,
+}
+
+
 @academic_bp.route("/classes", methods=["POST"])
 @role_required("admin")
 def create_class():
     data = request.get_json() or {}
 
-    name = data.get("name", "").strip()
-    description = data.get("description", "").strip()
+    name = str(data.get("name", "")).strip()
+    description = str(data.get("description", "")).strip()
 
     if not name:
         return jsonify({
             "success": False,
             "message": "Class name is required"
+        }), 400
+
+    level = CLASS_LEVELS.get(name)
+
+    if not level:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Invalid class. Allowed classes are: "
+                "PP1, PP2, Grade 1 to Grade 12"
+            )
         }), 400
 
     existing_class = db.session.scalar(
@@ -55,7 +101,8 @@ def create_class():
 
     school_class = SchoolClass(
         name=name,
-        description=description or None
+        description=description or f"{name} students",
+        level=level
     )
 
     db.session.add(school_class)
@@ -72,8 +119,15 @@ def create_class():
 @role_required("admin")
 def get_classes():
     classes = db.session.scalars(
-        select(SchoolClass).order_by(SchoolClass.name)
+        select(SchoolClass)
     ).all()
+
+    classes.sort(
+        key=lambda school_class: CLASS_ORDER.get(
+            school_class.name,
+            999
+        )
+    )
 
     return jsonify({
         "success": True,
