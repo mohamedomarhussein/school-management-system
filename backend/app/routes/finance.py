@@ -633,7 +633,7 @@ def get_student_balance(student_id):
         "success": True,
         "data": {
             "student_id": student.id,
-            "student_name": student.full_name,
+            "student_name": student.first_name + " " + student.last_name,
             "class_id": student.class_id,
             "academic_year": academic_year,
             "term": term,
