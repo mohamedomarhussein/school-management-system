@@ -35,12 +35,14 @@ def create_app():
     from .routes.academic import academic_bp
     from .routes.attendance import attendance_bp
     from .routes.exams import exams_bp
+    from .routes.finance import finance_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(academic_bp)
     app.register_blueprint(attendance_bp)
     app.register_blueprint(exams_bp)
+    app.register_blueprint(finance_bp)
 
     @app.route("/")
     def home():
