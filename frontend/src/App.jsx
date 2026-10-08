@@ -6,6 +6,7 @@ import Classes from "./pages/Classes";
 import Subjects from "./pages/Subjects";
 import TeacherAssignments from "./pages/TeacherAssignments";
 import Attendance from "./pages/Attendance";
+import Finance from "./pages/Finance";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -65,6 +66,18 @@ function App() {
           }
         />
 
+
+
+        <Route
+          path="/finance"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Finance />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/attendance"
