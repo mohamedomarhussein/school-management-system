@@ -101,6 +101,22 @@ def create_exam():
                 "message": "exam_date must be in YYYY-MM-DD format"
             }), 400
 
+    # Prevent duplicate exams for the same class, term, academic year and name
+    existing_exam = db.session.execute(
+        select(Exam).where(
+            Exam.name == str(name).strip(),
+            Exam.term == str(term).strip(),
+            Exam.academic_year == academic_year,
+            Exam.class_id == class_id
+        )
+    ).scalar_one_or_none()
+
+    if existing_exam:
+        return jsonify({
+            "success": False,
+            "message": "An exam with the same name already exists for this class, term and academic year"
+        }), 409
+
     exam = Exam(
         name=str(name).strip(),
         term=str(term).strip(),
