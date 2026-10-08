@@ -1,61 +1,154 @@
 import { useEffect, useState } from "react";
-import {
-  DollarSign,
-  Plus,
-  Receipt,
-  Wallet,
-} from "lucide-react";
+import { CreditCard, DollarSign, Plus, Wallet } from "lucide-react";
 import api from "../services/api";
 
 function Finance() {
-  const [fees, setFees] = useState([]);
+  const [feeStructures, setFeeStructures] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [streams, setStreams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchFinance();
+    fetchFinanceData();
   }, []);
 
-  const fetchFinance = async () => {
+  const fetchFinanceData = async () => {
     try {
-      const [feesResponse, paymentsResponse] =
-        await Promise.all([
-          api.get("/admin/finance/fee-structures"),
-          api.get("/admin/finance/payments"),
-        ]);
+      const [
+        feeStructuresResponse,
+        paymentsResponse,
+        studentsResponse,
+        classesResponse,
+        streamsResponse,
+      ] = await Promise.all([
+        api.get("/admin/finance/fee-structures"),
+        api.get("/admin/finance/payments"),
+        api.get("/admin/students"),
+        api.get("/admin/classes"),
+        api.get("/admin/streams"),
+      ]);
 
-      setFees(
-        feesResponse.data.data ||
-        feesResponse.data.fee_structures ||
-        []
+      setFeeStructures(
+        feeStructuresResponse.data.fee_structures ||
+          feeStructuresResponse.data.data ||
+          []
       );
 
       setPayments(
-        paymentsResponse.data.data ||
         paymentsResponse.data.payments ||
-        []
+          paymentsResponse.data.data ||
+          []
+      );
+
+      setStudents(
+        studentsResponse.data.students ||
+          studentsResponse.data.data ||
+          []
+      );
+
+      setClasses(
+        classesResponse.data.classes ||
+          classesResponse.data.data ||
+          []
+      );
+
+      setStreams(
+        streamsResponse.data.streams ||
+          streamsResponse.data.data ||
+          []
       );
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        "Failed to load finance information."
+          "Failed to load finance information."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const totalFees = fees.reduce(
+  const getStudentName = (student) => {
+    if (student.full_name) {
+      return student.full_name;
+    }
+
+    return [
+      student.first_name,
+      student.middle_name,
+      student.last_name,
+    ]
+      .filter(Boolean)
+      .join(" ") || "Unknown Student";
+  };
+
+  const getStudent = (payment) => {
+    return students.find(
+      (student) => student.id === payment.student_id
+    );
+  };
+
+  const getStudentClass = (student) => {
+    if (!student) return "—";
+
+    if (student.class_name) {
+      return student.class_name;
+    }
+
+    if (student.class?.name) {
+      return student.class.name;
+    }
+
+    const schoolClass = classes.find(
+      (item) => item.id === student.class_id
+    );
+
+    return schoolClass?.name || "—";
+  };
+
+  const getStudentStream = (student) => {
+    if (!student) return "—";
+
+    if (student.stream_name) {
+      return student.stream_name;
+    }
+
+    if (student.stream?.name) {
+      return student.stream.name;
+    }
+
+    const stream = streams.find(
+      (item) => item.id === student.stream_id
+    );
+
+    return stream?.name || "—";
+  };
+
+  const totalFees = feeStructures.reduce(
     (total, fee) => total + Number(fee.amount || 0),
     0
   );
 
   const totalPayments = payments.reduce(
-    (total, payment) =>
-      total + Number(payment.amount || 0),
+    (total, payment) => total + Number(payment.amount || 0),
     0
   );
+
+  const formatCurrency = (amount) => {
+    return `KES ${Number(amount || 0).toLocaleString()}`;
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "—";
+
+    return new Date(date).toLocaleDateString("en-KE", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className="page-content">
@@ -91,39 +184,34 @@ function Finance() {
             <div className="stat-card">
               <div>
                 <span>Total Fee Structures</span>
-                <strong>{fees.length}</strong>
+                <strong>{feeStructures.length}</strong>
               </div>
-
-              <Receipt size={28} />
-            </div>
-
-            <div className="stat-card">
-              <div>
-                <span>Total Fees</span>
-                <strong>
-                  KES {totalFees.toLocaleString()}
-                </strong>
-              </div>
-
               <Wallet size={28} />
             </div>
 
             <div className="stat-card">
               <div>
-                <span>Total Payments</span>
-                <strong>
-                  KES {totalPayments.toLocaleString()}
-                </strong>
+                <span>Total Fees</span>
+                <strong>{formatCurrency(totalFees)}</strong>
               </div>
-
               <DollarSign size={28} />
+            </div>
+
+            <div className="stat-card">
+              <div>
+                <span>Total Payments</span>
+                <strong>{formatCurrency(totalPayments)}</strong>
+              </div>
+              <CreditCard size={28} />
             </div>
           </div>
 
-          <div className="students-card">
+          <div className="dashboard-card">
             <div className="card-header">
-              <h3>Fee Structures</h3>
-              <p>Configured school fees</p>
+              <div>
+                <h3>Fee Structures</h3>
+                <p>Configured school fees</p>
+              </div>
             </div>
 
             <div className="table-wrapper">
@@ -138,34 +226,37 @@ function Finance() {
                 </thead>
 
                 <tbody>
-                  {fees.length > 0 ? (
-                    fees.map((fee) => (
-                      <tr key={fee.id}>
-                        <td>
-                          {fee.description || "School Fees"}
-                        </td>
+                  {feeStructures.length > 0 ? (
+                    feeStructures.map((fee) => {
+                      const schoolClass = classes.find(
+                        (item) => item.id === fee.class_id
+                      );
 
-                        <td>
-                          {fee.class_name ||
-                            fee.class?.name ||
-                            fee.class_id ||
-                            "—"}
-                        </td>
+                      return (
+                        <tr key={fee.id}>
+                          <td>
+                            {fee.description || "—"}
+                          </td>
 
-                        <td>
-                          {fee.academic_year || "—"}
-                        </td>
+                          <td>
+                            {schoolClass?.name ||
+                              fee.class_name ||
+                              fee.class_id ||
+                              "—"}
+                          </td>
 
-                        <td>
-                          <strong>
-                            KES{" "}
-                            {Number(
-                              fee.amount || 0
-                            ).toLocaleString()}
-                          </strong>
-                        </td>
-                      </tr>
-                    ))
+                          <td>
+                            {fee.academic_year || "—"}
+                          </td>
+
+                          <td>
+                            <strong>
+                              {formatCurrency(fee.amount)}
+                            </strong>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
                       <td colSpan="4">
@@ -180,10 +271,12 @@ function Finance() {
             </div>
           </div>
 
-          <div className="students-card">
+          <div className="dashboard-card">
             <div className="card-header">
-              <h3>Payments</h3>
-              <p>Recent student fee payments</p>
+              <div>
+                <h3>Payments</h3>
+                <p>Recent student fee payments</p>
+              </div>
             </div>
 
             <div className="table-wrapper">
@@ -191,6 +284,9 @@ function Finance() {
                 <thead>
                   <tr>
                     <th>Student</th>
+                    <th>Admission No.</th>
+                    <th>Class</th>
+                    <th>Stream</th>
                     <th>Amount</th>
                     <th>Date</th>
                     <th>Method</th>
@@ -199,40 +295,64 @@ function Finance() {
 
                 <tbody>
                   {payments.length > 0 ? (
-                    payments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td>
-                          {payment.student_name ||
-                            payment.student?.full_name ||
-                            payment.student_id ||
-                            "—"}
-                        </td>
+                    payments.map((payment) => {
+                      const student = getStudent(payment);
 
-                        <td>
-                          <strong>
-                            KES{" "}
-                            {Number(
-                              payment.amount || 0
-                            ).toLocaleString()}
-                          </strong>
-                        </td>
+                      return (
+                        <tr key={payment.id}>
+                          <td>
+                            <div className="student-name">
+                              <div className="student-avatar">
+                                {getStudentName(student)
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </div>
 
-                        <td>
-                          {payment.payment_date ||
-                            payment.date ||
-                            "—"}
-                        </td>
+                              <strong>
+                                {getStudentName(student)}
+                              </strong>
+                            </div>
+                          </td>
 
-                        <td>
-                          {payment.payment_method ||
-                            payment.method ||
-                            "—"}
-                        </td>
-                      </tr>
-                    ))
+                          <td>
+                            {student?.admission_number || "—"}
+                          </td>
+
+                          <td>
+                            {getStudentClass(student)}
+                          </td>
+
+                          <td>
+                            {getStudentStream(student)}
+                          </td>
+
+                          <td>
+                            <strong>
+                              {formatCurrency(payment.amount)}
+                            </strong>
+                          </td>
+
+                          <td>
+                            {formatDate(
+                              payment.payment_date ||
+                                payment.date ||
+                                payment.created_at
+                            )}
+                          </td>
+
+                          <td>
+                            <span className="badge">
+                              {payment.payment_method ||
+                                payment.method ||
+                                "—"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan="4">
+                      <td colSpan="7">
                         <div className="empty-state">
                           No payments found.
                         </div>
