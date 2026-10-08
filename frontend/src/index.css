@@ -859,3 +859,135 @@ td {
     padding: 18px;
   }
 }
+
+/* Classes & Streams Management */
+
+.classes-management-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(300px, 1fr)
+  );
+  gap: 20px;
+}
+
+.class-management-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.class-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.class-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+.class-card-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.class-management-card h3 {
+  margin: 18px 0 6px;
+  font-size: 20px;
+}
+
+.class-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.class-meta {
+  display: flex;
+  gap: 18px;
+  margin: 18px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.class-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.streams-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.small-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #eef2ff;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stream-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.stream-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  border-radius: 7px;
+  background: #f9fafb;
+  font-size: 14px;
+}
+
+.stream-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.icon-button.small {
+  width: 28px;
+  height: 28px;
+}
+
+.no-streams {
+  padding: 12px;
+  border-radius: 7px;
+  background: #f9fafb;
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+}
+
+.small-modal {
+  max-width: 520px;
+}
+
+@media (max-width: 600px) {
+  .classes-management-grid {
+    grid-template-columns: 1fr;
+  }
+}
