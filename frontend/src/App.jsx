@@ -8,6 +8,7 @@ import TeacherAssignments from "./pages/TeacherAssignments";
 import Attendance from "./pages/Attendance";
 import Finance from "./pages/Finance";
 import Exams from "./pages/Exams";
+import Settings from "./pages/Settings";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -67,8 +68,27 @@ function App() {
           }
         />
 
+        <Route
+          path="/teacher-assignments"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <TeacherAssignments />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
 
-
+        <Route
+          path="/attendance"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Attendance />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/exams"
@@ -93,22 +113,11 @@ function App() {
         />
 
         <Route
-          path="/attendance"
+          path="/settings"
           element={
             <ProtectedRoute>
               <Dashboard>
-                <Attendance />
-              </Dashboard>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/teacher-assignments"
-          element={
-            <ProtectedRoute>
-              <Dashboard>
-                <TeacherAssignments />
+                <Settings />
               </Dashboard>
             </ProtectedRoute>
           }
