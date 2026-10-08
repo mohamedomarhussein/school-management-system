@@ -1,16 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
-
-function Dashboard() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  return (
-    <div style={{ padding: "40px" }}>
-      <h1>Welcome, {user.full_name || "Administrator"}</h1>
-      <p>School Management Dashboard</p>
-    </div>
-  );
-}
+import Dashboard from "./pages/Dashboard";
+import Students from "./pages/Students";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -33,6 +24,17 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Students />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
