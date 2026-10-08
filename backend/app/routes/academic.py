@@ -158,9 +158,117 @@ def get_class(class_id):
     }), 200
 
 
+@academic_bp.route("/classes/<int:class_id>", methods=["PUT"])
+@role_required("admin")
+def update_class(class_id):
+    school_class = db.session.get(
+        SchoolClass,
+        class_id
+    )
+
+    if not school_class:
+        return jsonify({
+            "success": False,
+            "message": "Class not found"
+        }), 404
+
+    data = request.get_json() or {}
+
+    name = str(data.get("name", school_class.name)).strip()
+    description = str(
+        data.get("description", school_class.description or "")
+    ).strip()
+
+    level = CLASS_LEVELS.get(name)
+
+    if not level:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Invalid class. Allowed classes are: "
+                "PP1, PP2, Grade 1 to Grade 12"
+            )
+        }), 400
+
+    existing_class = db.session.scalar(
+        select(SchoolClass).where(
+            SchoolClass.name == name,
+            SchoolClass.id != class_id
+        )
+    )
+
+    if existing_class:
+        return jsonify({
+            "success": False,
+            "message": "This class already exists"
+        }), 409
+
+    school_class.name = name
+    school_class.description = (
+        description or f"{name} students"
+    )
+    school_class.level = level
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Class updated successfully",
+        "class": school_class.to_dict()
+    }), 200
+
+
+@academic_bp.route("/classes/<int:class_id>", methods=["DELETE"])
+@role_required("admin")
+def delete_class(class_id):
+    school_class = db.session.get(
+        SchoolClass,
+        class_id
+    )
+
+    if not school_class:
+        return jsonify({
+            "success": False,
+            "message": "Class not found"
+        }), 404
+
+    students = db.session.scalars(
+        select(Student).where(
+            Student.class_id == class_id
+        )
+    ).all()
+
+    if students:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Cannot delete this class because "
+                "students are assigned to it"
+            )
+        }), 409
+
+    streams = db.session.scalars(
+        select(Stream).where(
+            Stream.class_id == class_id
+        )
+    ).all()
+
+    for stream in streams:
+        db.session.delete(stream)
+
+    db.session.delete(school_class)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Class deleted successfully"
+    }), 200
+
+
 # ============================================================
 # STREAMS
 # ============================================================
+
 
 @academic_bp.route("/streams", methods=["POST"])
 @role_required("admin")
@@ -267,9 +375,116 @@ def get_class_streams(class_id):
     }), 200
 
 
+@academic_bp.route("/streams/<int:stream_id>", methods=["PUT"])
+@role_required("admin")
+def update_stream(stream_id):
+    stream = db.session.get(
+        Stream,
+        stream_id
+    )
+
+    if not stream:
+        return jsonify({
+            "success": False,
+            "message": "Stream not found"
+        }), 404
+
+    data = request.get_json() or {}
+
+    name = str(
+        data.get("name", stream.name)
+    ).strip()
+
+    class_id = data.get(
+        "class_id",
+        stream.class_id
+    )
+
+    if not name or not class_id:
+        return jsonify({
+            "success": False,
+            "message": "Stream name and class_id are required"
+        }), 400
+
+    school_class = db.session.get(
+        SchoolClass,
+        class_id
+    )
+
+    if not school_class:
+        return jsonify({
+            "success": False,
+            "message": "Class not found"
+        }), 404
+
+    existing_stream = db.session.scalar(
+        select(Stream).where(
+            Stream.name == name,
+            Stream.class_id == class_id,
+            Stream.id != stream_id
+        )
+    )
+
+    if existing_stream:
+        return jsonify({
+            "success": False,
+            "message": "This stream already exists in this class"
+        }), 409
+
+    stream.name = name
+    stream.class_id = class_id
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Stream updated successfully",
+        "stream": stream.to_dict()
+    }), 200
+
+
+@academic_bp.route("/streams/<int:stream_id>", methods=["DELETE"])
+@role_required("admin")
+def delete_stream(stream_id):
+    stream = db.session.get(
+        Stream,
+        stream_id
+    )
+
+    if not stream:
+        return jsonify({
+            "success": False,
+            "message": "Stream not found"
+        }), 404
+
+    students = db.session.scalars(
+        select(Student).where(
+            Student.stream_id == stream_id
+        )
+    ).all()
+
+    if students:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Cannot delete this stream because "
+                "students are assigned to it"
+            )
+        }), 409
+
+    db.session.delete(stream)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Stream deleted successfully"
+    }), 200
+
+
 # ============================================================
 # STUDENTS
 # ============================================================
+
 
 @academic_bp.route("/students", methods=["POST"])
 @role_required("admin")
