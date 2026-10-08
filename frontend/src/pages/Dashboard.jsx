@@ -6,6 +6,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  UserCheck,
   Users,
   Wallet,
   X,
@@ -18,13 +19,9 @@ function Dashboard({ children }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  );
 
   const navigation = [
     {
@@ -48,6 +45,11 @@ function Dashboard({ children }) {
       path: "/subjects",
     },
     {
+      label: "Teacher Assignments",
+      icon: UserCheck,
+      path: "/teacher-assignments",
+    },
+    {
       label: "Attendance",
       icon: CalendarCheck,
       path: "/attendance",
@@ -59,66 +61,64 @@ function Dashboard({ children }) {
     },
   ];
 
-  const stats = [
-    {
-      title: "Total Students",
-      value: "2",
-      icon: Users,
-    },
-    {
-      title: "Classes",
-      value: "3",
-      icon: GraduationCap,
-    },
-    {
-      title: "Subjects",
-      value: "5",
-      icon: BookOpen,
-    },
-    {
-      title: "Attendance",
-      value: "—",
-      icon: CalendarCheck,
-    },
-  ];
+  const handleNavigation = (path) => {
+    navigate(path);
+    setSidebarOpen(false);
+  };
 
-  const isDashboard = location.pathname === "/dashboard";
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <div className="dashboard-layout">
-      <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`sidebar ${
+          sidebarOpen ? "sidebar-open" : ""
+        }`}
+      >
         <div className="sidebar-header">
-          <div className="brand-icon">
+          <div className="school-logo">
             <GraduationCap size={24} />
           </div>
 
           <div>
             <h2>SchoolMS</h2>
-            <span>Administration</span>
+            <p>Administration</p>
           </div>
 
           <button
-            className="close-sidebar"
+            className="mobile-close"
             onClick={() => setSidebarOpen(false)}
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
         <nav className="sidebar-nav">
           {navigation.map((item) => {
             const Icon = item.icon;
+            const active =
+              location.pathname === item.path;
 
             return (
               <button
-                key={item.label}
+                key={item.path}
                 className={`nav-item ${
-                  location.pathname === item.path ? "active" : ""
+                  active ? "active" : ""
                 }`}
-                onClick={() => {
-                  navigate(item.path);
-                  setSidebarOpen(false);
-                }}
+                onClick={() =>
+                  handleNavigation(item.path)
+                }
               >
                 <Icon size={19} />
                 <span>{item.label}</span>
@@ -128,81 +128,101 @@ function Dashboard({ children }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <button className="nav-item">
+          <button
+            className="nav-item"
+            onClick={() => handleNavigation("/settings")}
+          >
             <Settings size={19} />
             <span>Settings</span>
           </button>
 
-          <button className="nav-item logout-button" onClick={handleLogout}>
+          <button
+            className="nav-item logout-button"
+            onClick={handleLogout}
+          >
             <LogOut size={19} />
             <span>Logout</span>
           </button>
         </div>
       </aside>
 
-      {sidebarOpen && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <main className="dashboard-main">
+      <main className="main-content">
         <header className="topbar">
           <button
-            className="menu-button"
+            className="mobile-menu"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu size={22} />
           </button>
 
           <div>
-            <h1>{isDashboard ? "Dashboard" : "School Management"}</h1>
+            <h1>
+              {location.pathname === "/dashboard"
+                ? "School Management"
+                : navigation.find(
+                    (item) =>
+                      item.path === location.pathname
+                  )?.label || "School Management"}
+            </h1>
+
             <p>Administration panel</p>
           </div>
 
           <div className="admin-profile">
             <div className="avatar">
-              {(user.full_name || "A").charAt(0).toUpperCase()}
+              {(user.name ||
+                user.full_name ||
+                "S"
+              )
+                .charAt(0)
+                .toUpperCase()}
             </div>
 
-            <div className="admin-info">
-              <strong>{user.full_name || "Administrator"}</strong>
+            <div>
+              <strong>
+                {user.name ||
+                  user.full_name ||
+                  "System Administrator"}
+              </strong>
               <span>{user.role || "admin"}</span>
             </div>
           </div>
         </header>
 
-        {isDashboard ? (
-          <section className="dashboard-content">
-            <div className="welcome-section">
-              <div>
-                <h2>
-                  Welcome back, {user.full_name || "Administrator"} 👋
-                </h2>
-                <p>
-                  Here's what's happening in your school today.
-                </p>
-              </div>
-            </div>
-
+        {children || (
+          <div className="dashboard-content">
             <div className="stats-grid">
-              {stats.map((stat) => {
-                const Icon = stat.icon;
+              <div className="stat-card">
+                <div>
+                  <span>Total Students</span>
+                  <strong>3</strong>
+                </div>
+                <Users size={28} />
+              </div>
 
-                return (
-                  <div className="stat-card" key={stat.title}>
-                    <div className="stat-icon">
-                      <Icon size={22} />
-                    </div>
+              <div className="stat-card">
+                <div>
+                  <span>Classes</span>
+                  <strong>3</strong>
+                </div>
+                <GraduationCap size={28} />
+              </div>
 
-                    <div>
-                      <p>{stat.title}</p>
-                      <h3>{stat.value}</h3>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="stat-card">
+                <div>
+                  <span>Subjects</span>
+                  <strong>5</strong>
+                </div>
+                <BookOpen size={28} />
+              </div>
+
+              <div className="stat-card">
+                <div>
+                  <span>Attendance</span>
+                  <strong>Active</strong>
+                </div>
+                <CalendarCheck size={28} />
+              </div>
             </div>
 
             <div className="dashboard-grid">
@@ -213,22 +233,38 @@ function Dashboard({ children }) {
                 </div>
 
                 <div className="quick-actions">
-                  <button onClick={() => navigate("/students")}>
+                  <button
+                    onClick={() =>
+                      navigate("/students")
+                    }
+                  >
                     <Users size={20} />
                     <span>Students</span>
                   </button>
 
-                  <button onClick={() => navigate("/classes")}>
+                  <button
+                    onClick={() =>
+                      navigate("/classes")
+                    }
+                  >
                     <GraduationCap size={20} />
                     <span>Classes</span>
                   </button>
 
-                  <button onClick={() => navigate("/subjects")}>
+                  <button
+                    onClick={() =>
+                      navigate("/subjects")
+                    }
+                  >
                     <BookOpen size={20} />
                     <span>Subjects</span>
                   </button>
 
-                  <button onClick={() => navigate("/finance")}>
+                  <button
+                    onClick={() =>
+                      navigate("/finance")
+                    }
+                  >
                     <Wallet size={20} />
                     <span>Finance</span>
                   </button>
@@ -241,27 +277,31 @@ function Dashboard({ children }) {
                   <p>Current system information</p>
                 </div>
 
-                <div className="status-list">
-                  <div className="status-item">
-                    <span>Backend API</span>
-                    <strong className="status-online">Online</strong>
+                <div className="system-status">
+                  <div>
+                    <span>Backend</span>
+                    <strong className="status-online">
+                      Online
+                    </strong>
                   </div>
 
-                  <div className="status-item">
-                    <span>Authentication</span>
-                    <strong className="status-online">Active</strong>
-                  </div>
-
-                  <div className="status-item">
+                  <div>
                     <span>Database</span>
-                    <strong className="status-online">Connected</strong>
+                    <strong className="status-online">
+                      Connected
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Authentication</span>
+                    <strong className="status-online">
+                      Secure
+                    </strong>
                   </div>
                 </div>
               </section>
             </div>
-          </section>
-        ) : (
-          children
+          </div>
         )}
       </main>
     </div>
