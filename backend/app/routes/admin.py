@@ -38,6 +38,88 @@ def get_teachers():
     }), 200
 
 
+@admin_bp.route("/teachers/<int:teacher_id>", methods=["PUT"])
+@role_required("admin")
+def update_teacher(teacher_id):
+    data = request.get_json() or {}
+
+    teacher = db.session.get(Teacher, teacher_id)
+
+    if not teacher or not teacher.user or teacher.user.role != "teacher":
+        return jsonify({
+            "success": False,
+            "message": "Teacher not found"
+        }), 404
+
+    full_name = data.get("full_name", "").strip()
+    email = data.get("email", "").strip().lower()
+    employee_number = data.get("employee_number", "").strip()
+    phone = data.get("phone", "").strip()
+    qualification = data.get("qualification", "").strip()
+
+    if not full_name or not email or not employee_number:
+        return jsonify({
+            "success": False,
+            "message": "Full name, email and employee number are required"
+        }), 400
+
+    existing_email = db.session.scalar(
+        select(User).where(
+            User.email == email,
+            User.id != teacher.user_id
+        )
+    )
+
+    if existing_email:
+        return jsonify({
+            "success": False,
+            "message": "Email address is already in use"
+        }), 409
+
+    existing_employee = db.session.scalar(
+        select(Teacher).where(
+            Teacher.employee_number == employee_number,
+            Teacher.id != teacher.id
+        )
+    )
+
+    if existing_employee:
+        return jsonify({
+            "success": False,
+            "message": "Employee number is already in use"
+        }), 409
+
+    try:
+        teacher.user.full_name = full_name
+        teacher.user.email = email
+        teacher.employee_number = employee_number
+        teacher.phone = phone or None
+        teacher.qualification = qualification or None
+
+        db.session.commit()
+
+        result = teacher.to_dict()
+        result["is_active"] = teacher.user.is_active
+        result["created_at"] = (
+            teacher.user.created_at.isoformat()
+            if teacher.user.created_at
+            else None
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "Teacher updated successfully",
+            "teacher": result
+        }), 200
+
+    except Exception:
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "message": "Unable to update teacher"
+        }), 500
+
+
 @admin_bp.route("/users", methods=["GET"])
 @role_required("admin")
 def get_users():
