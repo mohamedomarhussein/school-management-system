@@ -9,6 +9,35 @@ from app.utils.auth import role_required
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
 
 
+@admin_bp.route("/teachers", methods=["GET"])
+@role_required("admin")
+def get_teachers():
+    teachers = db.session.scalars(
+        select(Teacher)
+        .join(User, Teacher.user_id == User.id)
+        .where(User.role == "teacher")
+        .order_by(User.full_name.asc())
+    ).all()
+
+    data = []
+
+    for teacher in teachers:
+        item = teacher.to_dict()
+        item["is_active"] = teacher.user.is_active
+        item["created_at"] = (
+            teacher.user.created_at.isoformat()
+            if teacher.user.created_at
+            else None
+        )
+        data.append(item)
+
+    return jsonify({
+        "success": True,
+        "count": len(data),
+        "teachers": data
+    }), 200
+
+
 @admin_bp.route("/users", methods=["GET"])
 @role_required("admin")
 def get_users():

@@ -45,6 +45,11 @@ function Dashboard({ children }) {
       path: "/subjects",
     },
     {
+      label: "Teachers",
+      icon: GraduationCap,
+      path: "/teachers",
+    },
+    {
       label: "Teacher Assignments",
       icon: UserCheck,
       path: "/teacher-assignments",
