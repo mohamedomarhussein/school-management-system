@@ -1365,3 +1365,33 @@ def get_teacher_assignments():
     }), 200
 
 
+
+
+# ============================================================
+# DELETE TEACHER-SUBJECT ASSIGNMENT
+# ============================================================
+
+@academic_bp.route(
+    "/teacher-assignments/<int:assignment_id>",
+    methods=["DELETE"]
+)
+@role_required("admin")
+def delete_teacher_assignment(assignment_id):
+    assignment = db.session.get(
+        TeacherSubject,
+        assignment_id
+    )
+
+    if not assignment:
+        return jsonify({
+            "success": False,
+            "message": "Teacher assignment not found"
+        }), 404
+
+    db.session.delete(assignment)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Teacher assignment deleted successfully"
+    }), 200
