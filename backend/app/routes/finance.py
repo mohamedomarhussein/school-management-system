@@ -326,6 +326,12 @@ def create_payment():
             "message": "Fee structure not found"
         }), 404
 
+    if student.class_id != fee_structure.class_id:
+        return jsonify({
+            "success": False,
+            "message": "The fee structure does not belong to the student's class"
+        }), 400
+
     try:
         amount = Decimal(str(data["amount"]))
     except (InvalidOperation, TypeError, ValueError):
