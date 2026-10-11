@@ -65,10 +65,45 @@ class TeacherSubject(db.Model):
     )
 
     def to_dict(self):
+        teacher_name = None
+
+        if self.teacher and self.teacher.user:
+            teacher_name = self.teacher.user.full_name
+
         return {
             "id": self.id,
+
             "teacher_id": self.teacher_id,
+            "teacher_name": teacher_name,
+            "employee_number": (
+                self.teacher.employee_number
+                if self.teacher
+                else None
+            ),
+
             "subject_id": self.subject_id,
+            "subject_name": (
+                self.subject.name
+                if self.subject
+                else None
+            ),
+            "subject_code": (
+                self.subject.code
+                if self.subject
+                else None
+            ),
+
             "class_id": self.class_id,
-            "stream_id": self.stream_id
+            "class_name": (
+                self.school_class.name
+                if self.school_class
+                else None
+            ),
+
+            "stream_id": self.stream_id,
+            "stream_name": (
+                self.stream.name
+                if self.stream
+                else None
+            )
         }
