@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarCheck,
+  ClipboardList,
   GraduationCap,
   LayoutDashboard,
   LogOut,
@@ -58,6 +59,11 @@ function Dashboard({ children }) {
       label: "Attendance",
       icon: CalendarCheck,
       path: "/attendance",
+    },
+    {
+      label: "Exams & Results",
+      icon: ClipboardList,
+      path: "/exams",
     },
     {
       label: "Finance",
@@ -134,7 +140,9 @@ function Dashboard({ children }) {
 
         <div className="sidebar-bottom">
           <button
-            className="nav-item"
+            className={`nav-item ${
+              location.pathname === "/settings" ? "active" : ""
+            }`}
             onClick={() => handleNavigation("/settings")}
           >
             <Settings size={19} />
@@ -177,8 +185,7 @@ function Dashboard({ children }) {
             <div className="avatar">
               {(user.name ||
                 user.full_name ||
-                "S"
-              )
+                "S")
                 .charAt(0)
                 .toUpperCase()}
             </div>
@@ -239,36 +246,35 @@ function Dashboard({ children }) {
 
                 <div className="quick-actions">
                   <button
-                    onClick={() =>
-                      navigate("/students")
-                    }
+                    onClick={() => navigate("/students")}
                   >
                     <Users size={20} />
                     <span>Students</span>
                   </button>
 
                   <button
-                    onClick={() =>
-                      navigate("/classes")
-                    }
+                    onClick={() => navigate("/classes")}
                   >
                     <GraduationCap size={20} />
                     <span>Classes</span>
                   </button>
 
                   <button
-                    onClick={() =>
-                      navigate("/subjects")
-                    }
+                    onClick={() => navigate("/subjects")}
                   >
                     <BookOpen size={20} />
                     <span>Subjects</span>
                   </button>
 
                   <button
-                    onClick={() =>
-                      navigate("/finance")
-                    }
+                    onClick={() => navigate("/exams")}
+                  >
+                    <ClipboardList size={20} />
+                    <span>Exams & Results</span>
+                  </button>
+
+                  <button
+                    onClick={() => navigate("/finance")}
                   >
                     <Wallet size={20} />
                     <span>Finance</span>
