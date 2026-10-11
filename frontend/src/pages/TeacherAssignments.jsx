@@ -1,3 +1,4 @@
+import "./TeacherAssignments.css";
 import { useEffect, useMemo, useState } from "react";
 import {
   Plus,
@@ -257,7 +258,7 @@ function TeacherAssignments() {
     schoolClass.name || `Class ${schoolClass.id}`;
 
   return (
-    <div className="page-content space-y-6">
+    <div className="teacher-assignments-page page-content">
       <div className="page-header flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2>Teacher Assignments</h2>
