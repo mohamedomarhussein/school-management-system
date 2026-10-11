@@ -37,6 +37,7 @@ def create_app():
     from .routes.exams import exams_bp
     from .routes.finance import finance_bp
     from .routes.timetable import timetable_bp
+    from .routes.reports import reports_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(exams_bp)
     app.register_blueprint(finance_bp)
     app.register_blueprint(timetable_bp)
+    app.register_blueprint(reports_bp)
 
     @app.route("/")
     def home():

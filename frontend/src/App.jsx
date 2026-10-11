@@ -11,6 +11,7 @@ import Attendance from "./pages/Attendance";
 import Finance from "./pages/Finance";
 import Exams from "./pages/Exams";
 import Settings from "./pages/Settings";
+import Reports from "./pages/Reports";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -131,6 +132,17 @@ function App() {
             <ProtectedRoute>
               <Dashboard>
                 <Finance />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Reports />
               </Dashboard>
             </ProtectedRoute>
           }

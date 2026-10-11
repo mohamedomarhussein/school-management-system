@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarCheck,
+  ChartNoAxesCombined,
   CalendarClock,
   ClipboardList,
   GraduationCap,
@@ -65,6 +66,11 @@ function Dashboard({ children }) {
       label: "Attendance",
       icon: CalendarCheck,
       path: "/attendance",
+    },
+    {
+      label: "Reports & Analytics",
+      icon: ChartNoAxesCombined,
+      path: "/reports",
     },
     {
       label: "Exams & Results",
