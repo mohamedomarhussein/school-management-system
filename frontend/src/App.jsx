@@ -5,6 +5,7 @@ import Students from "./pages/Students";
 import Classes from "./pages/Classes";
 import Subjects from "./pages/Subjects";
 import TeacherAssignments from "./pages/TeacherAssignments";
+import Timetable from "./pages/Timetable";
 import Teachers from "./pages/Teachers";
 import Attendance from "./pages/Attendance";
 import Finance from "./pages/Finance";
@@ -86,6 +87,17 @@ function App() {
             <ProtectedRoute>
               <Dashboard>
                 <TeacherAssignments />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/timetable"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Timetable />
               </Dashboard>
             </ProtectedRoute>
           }

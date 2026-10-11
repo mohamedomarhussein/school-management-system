@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarCheck,
+  CalendarClock,
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
@@ -54,6 +55,11 @@ function Dashboard({ children }) {
       label: "Teacher Assignments",
       icon: UserCheck,
       path: "/teacher-assignments",
+    },
+    {
+      label: "Timetable",
+      icon: CalendarClock,
+      path: "/timetable",
     },
     {
       label: "Attendance",
