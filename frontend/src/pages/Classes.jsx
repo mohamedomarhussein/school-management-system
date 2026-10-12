@@ -5,6 +5,8 @@ import {
   Plus,
   Trash2,
   Users,
+  UserRoundCheck,
+  Layers,
   X,
 } from "lucide-react";
 import api from "../services/api";
@@ -317,6 +319,14 @@ function Classes() {
     ).length;
   };
 
+  const totalClasses = classes.length;
+  const totalStudents = students.length;
+  const totalStreams = streams.length;
+
+  const classesWithStudents = classes.filter(
+    (schoolClass) => getStudentCount(schoolClass.id) > 0
+  ).length;
+
   return (
     <div className="page-content">
       <div className="page-header">
@@ -343,6 +353,52 @@ function Classes() {
             {error}
           </div>
         )}
+
+      <div className="student-statistics class-statistics">
+        <div className="student-stat-card">
+          <div className="student-stat-icon total">
+            <GraduationCap size={22} />
+          </div>
+          <div>
+            <span>Total Classes</span>
+            <strong>{loading ? "—" : totalClasses}</strong>
+            <small>Registered classes</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon male">
+            <Users size={22} />
+          </div>
+          <div>
+            <span>Total Students</span>
+            <strong>{loading ? "—" : totalStudents}</strong>
+            <small>Across all classes</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon female">
+            <Layers size={22} />
+          </div>
+          <div>
+            <span>Total Streams</span>
+            <strong>{loading ? "—" : totalStreams}</strong>
+            <small>Configured streams</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon classes">
+            <UserRoundCheck size={22} />
+          </div>
+          <div>
+            <span>Classes with Students</span>
+            <strong>{loading ? "—" : classesWithStudents}</strong>
+            <small>Classes with enrollment</small>
+          </div>
+        </div>
+      </div>
 
       {loading ? (
         <div className="empty-state">
