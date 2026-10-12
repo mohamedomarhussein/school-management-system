@@ -12,6 +12,8 @@ from app.models import (
     Subject,
     Teacher,
     TeacherSubject,
+    User,
+    Notification,
 )
 from app.utils.auth import role_required
 
@@ -621,6 +623,30 @@ def create_student():
     )
 
     db.session.add(student)
+
+    # Notify every active administrator about the new student.
+    active_admins = User.query.filter_by(
+        role="admin",
+        is_active=True
+    ).all()
+
+    student_name = f"{first_name} {last_name}"
+
+    for admin in active_admins:
+        notification = Notification(
+            user_id=admin.id,
+            title="New student registered",
+            message=(
+                f"{student_name} has been registered successfully. "
+                f"Admission number: {admission_number}. "
+                f"Class: {school_class.name}."
+            ),
+            notification_type="student_created",
+            is_read=False
+        )
+        db.session.add(notification)
+
+    # Save the student and notifications together.
     db.session.commit()
 
     return jsonify({
