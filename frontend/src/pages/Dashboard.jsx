@@ -15,13 +15,50 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Dashboard({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await api.get("/notifications/unread-count");
+
+        if (mounted) {
+          const count = Number(response.data?.count ?? 0);
+          setUnreadCount(Number.isFinite(count) ? count : 0);
+        }
+      } catch (error) {
+        if (mounted) {
+          console.error("Could not load unread notifications:", error);
+        }
+      }
+    };
+
+    fetchUnreadCount();
+
+    const intervalId = window.setInterval(fetchUnreadCount, 30000);
+
+    const handleWindowFocus = () => {
+      fetchUnreadCount();
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      mounted = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [location.pathname]);
 
   const user = JSON.parse(
     localStorage.getItem("user") || "{}"
@@ -152,6 +189,30 @@ function Dashboard({ children }) {
               >
                 <Icon size={19} />
                 <span>{item.label}</span>
+
+                {item.path === "/notifications" && unreadCount > 0 && (
+                  <span
+                    aria-label={`${unreadCount} unread notifications`}
+                    title={`${unreadCount} unread notifications`}
+                    style={{
+                      marginLeft: "auto",
+                      minWidth: "22px",
+                      height: "22px",
+                      padding: "0 6px",
+                      borderRadius: "999px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#dc2626",
+                      color: "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </button>
             );
           })}
