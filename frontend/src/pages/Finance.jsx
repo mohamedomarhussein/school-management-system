@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CreditCard, DollarSign, Plus, Wallet } from "lucide-react";
 import api from "../services/api";
+import "./Finance.css";
 
 function Finance() {
   const [feeStructures, setFeeStructures] = useState([]);
@@ -151,7 +152,7 @@ function Finance() {
   };
 
   return (
-    <div className="page-content">
+    <div className="page-content finance-page">
       <div className="page-header">
         <div>
           <h2>Finance</h2>
@@ -180,29 +181,29 @@ function Finance() {
 
       {!loading && !error && (
         <>
-          <div className="stats-grid">
-            <div className="stat-card">
+          <div className="finance-stats-grid">
+            <div className="finance-stat-card">
               <div>
                 <span>Total Fee Structures</span>
                 <strong>{feeStructures.length}</strong>
               </div>
-              <Wallet size={28} />
+              <div className="finance-stat-icon"><Wallet size={24} /></div>
             </div>
 
-            <div className="stat-card">
+            <div className="finance-stat-card">
               <div>
                 <span>Total Fees</span>
                 <strong>{formatCurrency(totalFees)}</strong>
               </div>
-              <DollarSign size={28} />
+              <div className="finance-stat-icon"><DollarSign size={24} /></div>
             </div>
 
-            <div className="stat-card">
+            <div className="finance-stat-card">
               <div>
                 <span>Total Payments</span>
                 <strong>{formatCurrency(totalPayments)}</strong>
               </div>
-              <CreditCard size={28} />
+              <div className="finance-stat-icon"><CreditCard size={24} /></div>
             </div>
           </div>
 
