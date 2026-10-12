@@ -10,6 +10,8 @@ from app.models import (
     Student,
     SchoolClass,
     Subject,
+    User,
+    Notification,
 )
 from app.utils.auth import role_required
 
@@ -126,6 +128,36 @@ def create_exam():
     )
 
     db.session.add(exam)
+
+    # Notify every active administrator about the new exam.
+    active_admins = User.query.filter_by(
+        role="admin",
+        is_active=True
+    ).all()
+
+    scheduled_date = (
+        parsed_exam_date.isoformat()
+        if parsed_exam_date
+        else "Date not set"
+    )
+
+    for admin in active_admins:
+        notification = Notification(
+            user_id=admin.id,
+            title="New exam created",
+            message=(
+                f'Exam "{exam.name}" has been created for '
+                f'class ID {exam.class_id}. '
+                f'Term: {exam.term}. '
+                f'Academic year: {exam.academic_year}. '
+                f'Exam date: {scheduled_date}.'
+            ),
+            notification_type="exam_created",
+            is_read=False
+        )
+        db.session.add(notification)
+
+    # Save the exam and notifications together.
     db.session.commit()
 
     return jsonify({
