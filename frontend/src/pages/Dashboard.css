@@ -274,3 +274,28 @@
     transition: none;
   }
 }
+
+/* Dashboard data-loading and status states */
+
+.dashboard-layout .status-unavailable {
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-layout .status-checking {
+  color: #a16207;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-layout .dashboard-error {
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 14px;
+  line-height: 1.5;
+}
