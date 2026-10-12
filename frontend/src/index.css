@@ -2116,3 +2116,163 @@ td {
   }
 }
 
+
+/* =================================
+   TEACHERS MANAGEMENT — UI POLISH
+================================= */
+
+.teacher-stats {
+  gap: 18px;
+}
+
+.teacher-stat {
+  min-width: 0;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.teacher-stat:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.teacher-stat strong {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.teacher-search {
+  min-height: 42px;
+  background: #fff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.teacher-search:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.teacher-search input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.teacher-status {
+  white-space: nowrap;
+}
+
+.teacher-action-button {
+  color: #475569;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.teacher-action-button:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.teacher-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.teacher-notice {
+  line-height: 1.5;
+}
+
+.teacher-modal {
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.teacher-modal-title {
+  align-items: flex-start;
+}
+
+.teacher-modal-title h2 {
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.teacher-form-grid input {
+  min-height: 42px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.teacher-form-grid input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.teacher-form-actions button {
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+
+.teacher-form-actions button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 760px) {
+  .teacher-stats {
+    gap: 12px;
+  }
+
+  .teacher-stat {
+    padding: 16px;
+  }
+
+  .teacher-modal {
+    padding: 20px;
+  }
+
+  .teacher-modal-title h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .teacher-stat {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .teacher-stat strong {
+    font-size: 22px;
+  }
+
+  .teacher-search {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .teacher-modal-overlay {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .teacher-modal {
+    max-height: calc(100vh - 24px);
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .teacher-form-actions {
+    flex-wrap: wrap;
+  }
+}
