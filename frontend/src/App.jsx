@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import Classes from "./pages/Classes";
@@ -34,6 +36,10 @@ function App() {
 
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
+
+        {/* Legal pages */}
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
 
         {/* Protected administration dashboard */}
         <Route
@@ -153,7 +159,7 @@ function App() {
           }
         />
 
-        {/* Legal pages will be added separately */}
+        {/* Redirect unknown URLs to the homepage */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
