@@ -473,8 +473,13 @@ function Students() {
                           </td>
 
                           <td>
-                            {student.admission_number ||
-                              "—"}
+                            {student.admission_number ? (
+                              <span className="admission-number">
+                                {student.admission_number}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
                           </td>
 
                           <td>
@@ -486,12 +491,39 @@ function Students() {
                           </td>
 
                           <td>
-                            {student.gender || "—"}
+                            {student.gender ? (
+                              <span
+                                className={`badge ${
+                                  String(student.gender).toLowerCase() === "male"
+                                    ? "male"
+                                    : String(student.gender).toLowerCase() === "female"
+                                    ? "female"
+                                    : ""
+                                }`}
+                              >
+                                {student.gender}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
                           </td>
 
                           <td>
-                            {student.date_of_birth ||
-                              "—"}
+                            {student.date_of_birth
+                              ? (() => {
+                                  const date = new Date(
+                                    `${student.date_of_birth}`.slice(0, 10) + "T00:00:00"
+                                  );
+
+                                  return Number.isNaN(date.getTime())
+                                    ? student.date_of_birth
+                                    : date.toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                      });
+                                })()
+                              : "—"}
                           </td>
 
                           <td>
