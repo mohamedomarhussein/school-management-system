@@ -1553,3 +1553,57 @@ td {
     width: 100%;
   }
 }
+
+/* LOGIN PAGE HOME NAVIGATION */
+
+.login-page {
+  flex-direction: column;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 430px;
+}
+
+.login-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-home-link:hover {
+  color: #2563eb;
+}
+
+.login-home-link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.login-container .login-card {
+  max-width: none;
+}
+
+.login-footer {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.login-footer a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-footer a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
