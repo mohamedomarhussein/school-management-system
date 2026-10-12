@@ -5,6 +5,9 @@ import {
   Search,
   Trash2,
   Users,
+  UserRound,
+  UserRoundCheck,
+  GraduationCap,
   X,
 } from "lucide-react";
 import api from "../services/api";
@@ -264,10 +267,28 @@ function Students() {
         }`.toLowerCase();
 
       return searchText.includes(
-        search.toLowerCase()
+        search.trim().toLowerCase()
       );
     }
   );
+
+  const totalStudents = students.length;
+
+  const maleStudents = students.filter(
+    (student) =>
+      String(student.gender || "").toLowerCase() === "male"
+  ).length;
+
+  const femaleStudents = students.filter(
+    (student) =>
+      String(student.gender || "").toLowerCase() === "female"
+  ).length;
+
+  const classesRepresented = new Set(
+    students
+      .map((student) => student.class_id)
+      .filter((classId) => classId !== null && classId !== undefined)
+  ).size;
 
   return (
     <div className="page-content">
@@ -294,6 +315,52 @@ function Students() {
           {error}
         </div>
       )}
+
+      <div className="student-statistics">
+        <div className="student-stat-card">
+          <div className="student-stat-icon total">
+            <Users size={22} />
+          </div>
+          <div>
+            <span>Total Students</span>
+            <strong>{loading ? "—" : totalStudents}</strong>
+            <small>Registered students</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon male">
+            <UserRound size={22} />
+          </div>
+          <div>
+            <span>Male Students</span>
+            <strong>{loading ? "—" : maleStudents}</strong>
+            <small>Male registrations</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon female">
+            <UserRoundCheck size={22} />
+          </div>
+          <div>
+            <span>Female Students</span>
+            <strong>{loading ? "—" : femaleStudents}</strong>
+            <small>Female registrations</small>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon classes">
+            <GraduationCap size={22} />
+          </div>
+          <div>
+            <span>Classes Represented</span>
+            <strong>{loading ? "—" : classesRepresented}</strong>
+            <small>Classes with students</small>
+          </div>
+        </div>
+      </div>
 
       <div className="students-toolbar">
         <div className="search-box">
