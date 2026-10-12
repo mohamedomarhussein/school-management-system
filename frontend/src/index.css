@@ -1901,3 +1901,218 @@ td {
   white-space: nowrap;
 }
 
+
+/* =================================
+   CLASSES & STREAMS — UI POLISH
+================================= */
+
+.classes-management-grid {
+  align-items: stretch;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.class-management-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.class-management-card:hover {
+  transform: translateY(-3px);
+  border-color: #c7d2fe;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.class-card-header {
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.class-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #e0e7ff;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  color: #4338ca;
+}
+
+.class-card-actions {
+  align-items: center;
+  gap: 8px;
+}
+
+.class-management-card h3 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.class-description {
+  min-height: 20px;
+  color: #6b7280;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.class-meta {
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 20px 0;
+  padding: 16px 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.class-meta span {
+  gap: 7px;
+}
+
+.streams-header {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.streams-header h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.small-button {
+  flex-shrink: 0;
+  padding: 8px 11px;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.small-button:hover {
+  border-color: #c7d2fe;
+  background: #e0e7ff;
+}
+
+.stream-list {
+  gap: 9px;
+}
+
+.stream-item {
+  min-width: 0;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #f1f5f9;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #374151;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.stream-item:hover {
+  border-color: #e0e7ff;
+  background: #f1f5f9;
+}
+
+.stream-item > span,
+.stream-item > div:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.stream-actions {
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-button.small {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+}
+
+.no-streams {
+  padding: 18px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.small-modal {
+  width: 100%;
+  max-width: 520px;
+}
+
+@media (max-width: 768px) {
+  .classes-management-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .class-management-card {
+    padding: 20px;
+  }
+
+  .class-meta {
+    gap: 12px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .class-management-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .class-card-header {
+    align-items: flex-start;
+  }
+
+  .class-management-card h3 {
+    font-size: 18px;
+  }
+
+  .class-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .streams-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .stream-item {
+    padding: 9px;
+  }
+
+  .stream-actions {
+    gap: 4px;
+  }
+}
+
