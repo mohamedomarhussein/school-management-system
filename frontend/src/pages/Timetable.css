@@ -725,3 +725,82 @@
     white-space: normal;
   }
 }
+
+/* Final timetable page refinements */
+.timetable-page {
+  min-width: 0;
+}
+
+.timetable-stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.timetable-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgb(26 39 74 / 7%);
+}
+
+.timetable-reset-button:hover {
+  color: #3546b5;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.timetable-lesson-actions button:focus-visible,
+.timetable-button:focus-visible,
+.timetable-reset-button:focus-visible,
+.timetable-modal-close:focus-visible {
+  outline: 3px solid rgb(79 95 213 / 35%);
+  outline-offset: 2px;
+}
+
+.timetable-form label {
+  min-width: 0;
+}
+
+.timetable-form input:hover,
+.timetable-form select:hover {
+  border-color: #c8d0e0;
+}
+
+.timetable-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .timetable-heading {
+    gap: 16px;
+  }
+
+  .timetable-heading h1 {
+    letter-spacing: -0.5px;
+  }
+
+  .timetable-stat-card small {
+    font-size: 11px;
+  }
+
+  .timetable-lesson-card {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timetable-stat-card,
+  .timetable-button,
+  .timetable-lesson-card {
+    transition: none;
+  }
+
+  .timetable-stat-card:hover,
+  .timetable-button-primary:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .timetable-page .is-spinning {
+    animation: none;
+  }
+}
