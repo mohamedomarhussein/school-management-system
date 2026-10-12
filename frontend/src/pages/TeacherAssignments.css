@@ -404,3 +404,95 @@
     padding: 17px;
   }
 }
+
+/* =========================================
+   TEACHER ASSIGNMENTS — FINAL UI POLISH
+========================================= */
+
+.teacher-assignments-page
+  > .grid.grid-cols-1.gap-4
+  > div {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.teacher-assignments-page
+  > .grid.grid-cols-1.gap-4
+  > div:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgb(15 23 42 / 6%);
+}
+
+.teacher-assignments-page .students-card {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.teacher-assignments-page .students-toolbar input,
+.teacher-assignments-page .students-toolbar select {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.teacher-assignments-page .students-toolbar select {
+  cursor: pointer;
+}
+
+.teacher-assignments-page .students-toolbar select:focus-visible,
+.teacher-assignments-page .students-toolbar button:focus-visible,
+.teacher-assignments-page button:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.teacher-assignments-page .student-avatar {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.teacher-assignments-page tbody tr:hover .student-avatar {
+  border-color: #bfdbfe;
+  background: #dbeafe;
+}
+
+.teacher-assignments-page .empty-state {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .teacher-assignments-page .students-toolbar {
+    padding: 14px;
+  }
+
+  .teacher-assignments-page .students-toolbar > div {
+    min-width: 0;
+  }
+
+  .teacher-assignments-page .students-toolbar .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .teacher-assignments-page .student-count {
+    flex-wrap: wrap;
+  }
+
+  .teacher-assignments-page .table-wrapper table {
+    min-width: 600px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teacher-assignments-page *,
+  .teacher-assignments-page *::before,
+  .teacher-assignments-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
