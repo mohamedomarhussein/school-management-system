@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
@@ -28,8 +29,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public website */}
+        <Route path="/" element={<Home />} />
+
+        {/* Authentication */}
         <Route path="/login" element={<Login />} />
 
+        {/* Protected administration dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -43,9 +49,7 @@ function App() {
           path="/students"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Students />
-              </Dashboard>
+              <Dashboard><Students /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -54,9 +58,7 @@ function App() {
           path="/classes"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Classes />
-              </Dashboard>
+              <Dashboard><Classes /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -65,9 +67,7 @@ function App() {
           path="/subjects"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Subjects />
-              </Dashboard>
+              <Dashboard><Subjects /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -76,9 +76,7 @@ function App() {
           path="/teachers"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Teachers />
-              </Dashboard>
+              <Dashboard><Teachers /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -87,9 +85,7 @@ function App() {
           path="/teacher-assignments"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <TeacherAssignments />
-              </Dashboard>
+              <Dashboard><TeacherAssignments /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -98,9 +94,7 @@ function App() {
           path="/timetable"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Timetable />
-              </Dashboard>
+              <Dashboard><Timetable /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -109,9 +103,7 @@ function App() {
           path="/attendance"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Attendance />
-              </Dashboard>
+              <Dashboard><Attendance /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -120,9 +112,7 @@ function App() {
           path="/exams"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Exams />
-              </Dashboard>
+              <Dashboard><Exams /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -131,9 +121,7 @@ function App() {
           path="/finance"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Finance />
-              </Dashboard>
+              <Dashboard><Finance /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -142,9 +130,7 @@ function App() {
           path="/reports"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Reports />
-              </Dashboard>
+              <Dashboard><Reports /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -153,9 +139,7 @@ function App() {
           path="/notifications"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Notifications />
-              </Dashboard>
+              <Dashboard><Notifications /></Dashboard>
             </ProtectedRoute>
           }
         />
@@ -164,22 +148,13 @@ function App() {
           path="/settings"
           element={
             <ProtectedRoute>
-              <Dashboard>
-                <Settings />
-              </Dashboard>
+              <Dashboard><Settings /></Dashboard>
             </ProtectedRoute>
           }
         />
 
-        <Route
-          path="/"
-          element={<Navigate to="/login" replace />}
-        />
-
-        <Route
-          path="*"
-          element={<Navigate to="/login" replace />}
-        />
+        {/* Legal pages will be added separately */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
