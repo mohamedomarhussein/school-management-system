@@ -18,6 +18,7 @@ function Students() {
   const [streams, setStreams] = useState([]);
 
   const [search, setSearch] = useState("");
+  const [selectedClass, setSelectedClass] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
@@ -257,20 +258,22 @@ function Students() {
     );
   };
 
-  const filteredStudents = students.filter(
-    (student) => {
-      const searchText =
-        `${student.first_name || ""} ${
-          student.last_name || ""
-        } ${
-          student.admission_number || ""
-        }`.toLowerCase();
+  const filteredStudents = students.filter((student) => {
+    const searchText =
+      `${student.first_name || ""} ${
+        student.last_name || ""
+      } ${student.admission_number || ""}`.toLowerCase();
 
-      return searchText.includes(
-        search.trim().toLowerCase()
-      );
-    }
-  );
+    const matchesSearch = searchText.includes(
+      search.trim().toLowerCase()
+    );
+
+    const matchesClass =
+      !selectedClass ||
+      String(student.class_id) === selectedClass;
+
+    return matchesSearch && matchesClass;
+  });
 
   const totalStudents = students.length;
 
@@ -363,23 +366,58 @@ function Students() {
       </div>
 
       <div className="students-toolbar">
-        <div className="search-box">
-          <Search size={18} />
+        <div className="student-filter-controls">
+          <div className="search-box">
+            <Search size={18} />
 
-          <input
-            type="text"
-            placeholder="Search by name or admission number..."
-            value={search}
+            <input
+              type="text"
+              placeholder="Search by name or admission number..."
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+            />
+          </div>
+
+          <select
+            className="class-filter"
+            aria-label="Filter students by class"
+            value={selectedClass}
             onChange={(event) =>
-              setSearch(event.target.value)
+              setSelectedClass(event.target.value)
             }
-          />
+          >
+            <option value="">All Classes</option>
+            {classes.map((schoolClass) => (
+              <option
+                key={schoolClass.id}
+                value={String(schoolClass.id)}
+              >
+                {schoolClass.name}
+              </option>
+            ))}
+          </select>
+
+          {(search || selectedClass) && (
+            <button
+              type="button"
+              className="clear-filters-button"
+              onClick={() => {
+                setSearch("");
+                setSelectedClass("");
+              }}
+            >
+              <X size={15} />
+              Clear Filters
+            </button>
+          )}
         </div>
 
         <div className="student-count">
           <Users size={18} />
           <span>
-            {filteredStudents.length} Students
+            {filteredStudents.length} of {students.length} Students
           </span>
         </div>
       </div>

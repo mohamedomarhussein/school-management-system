@@ -1802,3 +1802,77 @@ td {
   }
 }
 
+
+/* STUDENTS SEARCH AND CLASS FILTER */
+
+.student-filter-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.student-filter-controls .search-box {
+  flex: 1;
+  min-width: 220px;
+}
+
+.class-filter {
+  min-width: 160px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #dce1e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.class-filter:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.clear-filters-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.clear-filters-button:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+@media (max-width: 700px) {
+  .student-filter-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-filter-controls .search-box,
+  .class-filter {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .clear-filters-button {
+    align-self: flex-start;
+  }
+}
