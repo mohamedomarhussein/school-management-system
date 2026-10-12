@@ -1054,3 +1054,146 @@
     font-size: 11px;
   }
 }
+
+/* Final Exams & Results refinements */
+.exams-page {
+  min-width: 0;
+}
+
+.exams-stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exams-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgb(26 44 78 / 7%);
+}
+
+.exams-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.exams-icon-button:focus-visible,
+.exams-primary-button:focus-visible,
+.exams-secondary-button:focus-visible,
+.exams-reset-button:focus-visible,
+.exams-tabs button:focus-visible,
+.exams-modal-close:focus-visible,
+.exams-notice button:focus-visible,
+.exams-alert button:focus-visible {
+  outline: 3px solid rgb(49 87 213 / 30%);
+  outline-offset: 2px;
+}
+
+.exams-primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+  transform: none;
+}
+
+.exams-icon-button:active:not(:disabled),
+.exams-primary-button:active:not(:disabled),
+.exams-secondary-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.exams-form-field input:hover:not(:disabled),
+.exams-form-field select:hover:not(:disabled),
+.exams-filter-panel select:hover {
+  border-color: #c6d1e2;
+}
+
+.exams-modal-header {
+  position: sticky;
+  top: -25px;
+  z-index: 2;
+  padding-top: 2px;
+  background: #fff;
+}
+
+.exams-table-card,
+.exams-filter-panel,
+.exams-stat-card,
+.exams-grading-note {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .exams-heading h2 {
+    letter-spacing: -0.5px;
+  }
+
+  .exams-heading-actions {
+    gap: 8px;
+  }
+
+  .exams-heading-actions button {
+    min-width: 0;
+    padding: 10px 11px;
+  }
+
+  .exams-record-count {
+    padding: 6px 8px;
+  }
+
+  .exams-table-heading {
+    align-items: flex-start;
+  }
+
+  .exams-modal-header {
+    top: -19px;
+  }
+}
+
+@media (max-width: 440px) {
+  .exams-heading-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .exams-heading-actions button:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .exams-tabs {
+    overflow-x: auto;
+  }
+
+  .exams-tabs button {
+    flex-shrink: 0;
+  }
+
+  .exams-table-heading {
+    gap: 8px;
+  }
+
+  .exams-table-heading p {
+    max-width: 240px;
+  }
+
+  .exams-modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .exams-modal-actions button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exams-stat-card,
+  .exams-table tbody tr,
+  .exams-icon-button,
+  .exams-primary-button,
+  .exams-secondary-button,
+  .exams-modal {
+    animation: none;
+    transition: none;
+  }
+
+  .exams-stat-card:hover,
+  .exams-primary-button:hover:not(:disabled) {
+    transform: none;
+  }
+}
