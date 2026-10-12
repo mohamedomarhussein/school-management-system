@@ -11,6 +11,7 @@ import Attendance from "./pages/Attendance";
 import Finance from "./pages/Finance";
 import Exams from "./pages/Exams";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notifications";
 import Reports from "./pages/Reports";
 
 function ProtectedRoute({ children }) {
@@ -143,6 +144,17 @@ function App() {
             <ProtectedRoute>
               <Dashboard>
                 <Reports />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Dashboard>
+                <Notifications />
               </Dashboard>
             </ProtectedRoute>
           }

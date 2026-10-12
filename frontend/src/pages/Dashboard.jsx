@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  Bell,
   CalendarCheck,
   ChartNoAxesCombined,
   CalendarClock,
@@ -82,6 +83,12 @@ function Dashboard({ children }) {
       icon: Wallet,
       path: "/finance",
     },
+    {
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+    },
+
   ];
 
   const handleNavigation = (path) => {
