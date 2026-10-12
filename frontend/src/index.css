@@ -1699,3 +1699,106 @@ td {
     padding: 17px;
   }
 }
+
+/* STUDENTS TABLE — PROFESSIONAL ENHANCEMENTS */
+
+.students-card {
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
+  transition: box-shadow 0.2s ease;
+}
+
+.students-card .table-wrapper table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.students-card .table-wrapper table tbody tr:hover {
+  background-color: #f8faff;
+}
+
+.students-card .table-wrapper table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.students-card th {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.students-card td {
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.students-card .student-avatar {
+  flex-shrink: 0;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.search-box {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-box input {
+  font-family: inherit;
+  font-size: 13px;
+  color: #172033;
+}
+
+.search-box input::placeholder {
+  color: #9aa3b2;
+}
+
+.students-card .badge {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.students-card .badge[data-gender="male"],
+.students-card .badge.male {
+  background: #e8f2ff;
+  color: #1d4ed8;
+}
+
+.students-card .badge[data-gender="female"],
+.students-card .badge.female {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.students-card .action-buttons {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.students-card .icon-button {
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.students-card .empty-state {
+  padding: 56px 20px;
+}
+
+@media (max-width: 700px) {
+  .students-card {
+    border-radius: 10px;
+  }
+
+  .students-card th,
+  .students-card td {
+    padding: 12px 14px;
+  }
+
+  .students-card .students-toolbar {
+    padding: 16px;
+  }
+}
+
