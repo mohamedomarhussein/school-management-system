@@ -1,22 +1,30 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+// Global components
+import ScrollToTop from "./components/ScrollToTop";
+
+// Public pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+
+// Dashboard pages
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import Classes from "./pages/Classes";
 import Subjects from "./pages/Subjects";
+import Teachers from "./pages/Teachers";
 import TeacherAssignments from "./pages/TeacherAssignments";
 import Timetable from "./pages/Timetable";
-import Teachers from "./pages/Teachers";
 import Attendance from "./pages/Attendance";
-import Finance from "./pages/Finance";
 import Exams from "./pages/Exams";
-import Settings from "./pages/Settings";
-import Notifications from "./pages/Notifications";
+import Finance from "./pages/Finance";
 import Reports from "./pages/Reports";
+import Notifications from "./pages/Notifications";
+import Settings from "./pages/Settings";
 
+// Protect administration routes
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
 
@@ -30,18 +38,26 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <BrowserRouter>
+      {/* Automatically scroll to the top when the URL changes */}
+      <ScrollToTop />
+
       <Routes>
-        {/* Public website */}
+        {/* ================= PUBLIC WEBSITE ================= */}
+
         <Route path="/" element={<Home />} />
 
-        {/* Authentication */}
+        {/* ================= AUTHENTICATION ================= */}
+
         <Route path="/login" element={<Login />} />
 
-        {/* Legal pages */}
+        {/* ================= LEGAL PAGES ================= */}
+
         <Route path="/terms" element={<Terms />} />
+
         <Route path="/privacy" element={<Privacy />} />
 
-        {/* Protected administration dashboard */}
+        {/* ================= ADMINISTRATION DASHBOARD ================= */}
+
         <Route
           path="/dashboard"
           element={
@@ -51,115 +67,152 @@ function App() {
           }
         />
 
+        {/* Students */}
         <Route
           path="/students"
           element={
             <ProtectedRoute>
-              <Dashboard><Students /></Dashboard>
+              <Dashboard>
+                <Students />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Classes */}
         <Route
           path="/classes"
           element={
             <ProtectedRoute>
-              <Dashboard><Classes /></Dashboard>
+              <Dashboard>
+                <Classes />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Subjects */}
         <Route
           path="/subjects"
           element={
             <ProtectedRoute>
-              <Dashboard><Subjects /></Dashboard>
+              <Dashboard>
+                <Subjects />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Teachers */}
         <Route
           path="/teachers"
           element={
             <ProtectedRoute>
-              <Dashboard><Teachers /></Dashboard>
+              <Dashboard>
+                <Teachers />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Teacher assignments */}
         <Route
           path="/teacher-assignments"
           element={
             <ProtectedRoute>
-              <Dashboard><TeacherAssignments /></Dashboard>
+              <Dashboard>
+                <TeacherAssignments />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Timetable */}
         <Route
           path="/timetable"
           element={
             <ProtectedRoute>
-              <Dashboard><Timetable /></Dashboard>
+              <Dashboard>
+                <Timetable />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Attendance */}
         <Route
           path="/attendance"
           element={
             <ProtectedRoute>
-              <Dashboard><Attendance /></Dashboard>
+              <Dashboard>
+                <Attendance />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Examinations */}
         <Route
           path="/exams"
           element={
             <ProtectedRoute>
-              <Dashboard><Exams /></Dashboard>
+              <Dashboard>
+                <Exams />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Finance */}
         <Route
           path="/finance"
           element={
             <ProtectedRoute>
-              <Dashboard><Finance /></Dashboard>
+              <Dashboard>
+                <Finance />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Reports */}
         <Route
           path="/reports"
           element={
             <ProtectedRoute>
-              <Dashboard><Reports /></Dashboard>
+              <Dashboard>
+                <Reports />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Notifications */}
         <Route
           path="/notifications"
           element={
             <ProtectedRoute>
-              <Dashboard><Notifications /></Dashboard>
+              <Dashboard>
+                <Notifications />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
+        {/* Settings */}
         <Route
           path="/settings"
           element={
             <ProtectedRoute>
-              <Dashboard><Settings /></Dashboard>
+              <Dashboard>
+                <Settings />
+              </Dashboard>
             </ProtectedRoute>
           }
         />
 
-        {/* Redirect unknown URLs to the homepage */}
+        {/* ================= UNKNOWN ROUTES ================= */}
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
