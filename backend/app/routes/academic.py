@@ -13,6 +13,8 @@ from app.models import (
     Teacher,
     TeacherSubject,
     User,
+    Parent,
+    StudentParent,
     Notification,
 )
 from app.utils.auth import role_required
@@ -1420,4 +1422,183 @@ def delete_teacher_assignment(assignment_id):
     return jsonify({
         "success": True,
         "message": "Teacher assignment deleted successfully"
+    }), 200
+
+
+# ============================================================
+# PARENT-STUDENT LINKS
+# ============================================================
+
+@academic_bp.route("/parent-links", methods=["POST"])
+@role_required("admin")
+def create_parent_link():
+    data = request.get_json() or {}
+
+    parent_id = data.get("parent_id")
+    student_id = data.get("student_id")
+    relationship_type = str(
+        data.get("relationship_type", "Parent")
+    ).strip()
+    is_primary = data.get("is_primary", False)
+
+    if parent_id is None or student_id is None:
+        return jsonify({
+            "success": False,
+            "message": "parent_id and student_id are required"
+        }), 400
+
+    try:
+        parent_id = int(parent_id)
+        student_id = int(student_id)
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "message": "parent_id and student_id must be integers"
+        }), 400
+
+    if parent_id <= 0 or student_id <= 0:
+        return jsonify({
+            "success": False,
+            "message": "IDs must be positive integers"
+        }), 400
+
+    if not relationship_type:
+        return jsonify({
+            "success": False,
+            "message": "relationship_type cannot be empty"
+        }), 400
+
+    if not isinstance(is_primary, bool):
+        return jsonify({
+            "success": False,
+            "message": "is_primary must be true or false"
+        }), 400
+
+    parent = db.session.get(Parent, parent_id)
+
+    if not parent:
+        return jsonify({
+            "success": False,
+            "message": "Parent not found"
+        }), 404
+
+    student = db.session.get(Student, student_id)
+
+    if not student:
+        return jsonify({
+            "success": False,
+            "message": "Student not found"
+        }), 404
+
+    existing_link = db.session.scalar(
+        select(StudentParent).where(
+            StudentParent.parent_id == parent_id,
+            StudentParent.student_id == student_id
+        )
+    )
+
+    if existing_link:
+        return jsonify({
+            "success": False,
+            "message": "This parent is already linked to this student"
+        }), 409
+
+    if is_primary:
+        other_links = db.session.scalars(
+            select(StudentParent).where(
+                StudentParent.student_id == student_id,
+                StudentParent.is_primary.is_(True)
+            )
+        ).all()
+
+        for link in other_links:
+            link.is_primary = False
+
+    link = StudentParent(
+        parent_id=parent_id,
+        student_id=student_id,
+        relationship_type=relationship_type,
+        is_primary=is_primary
+    )
+
+    db.session.add(link)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Parent linked to student successfully",
+        "data": {
+            **link.to_dict(),
+            "parent_name": (
+                parent.user.full_name if parent.user else None
+            ),
+            "student_name": (
+                f"{student.first_name} {student.last_name}".strip()
+            )
+        }
+    }), 201
+
+
+@academic_bp.route("/parent-links", methods=["GET"])
+@role_required("admin")
+def get_parent_links():
+    query = select(StudentParent).order_by(
+        StudentParent.student_id,
+        StudentParent.parent_id
+    )
+
+    raw_parent_id = request.args.get("parent_id")
+    raw_student_id = request.args.get("student_id")
+
+    try:
+        if raw_parent_id is not None:
+            parent_id = int(raw_parent_id)
+
+            if parent_id <= 0:
+                raise ValueError
+
+            query = query.where(
+                StudentParent.parent_id == parent_id
+            )
+
+        if raw_student_id is not None:
+            student_id = int(raw_student_id)
+
+            if student_id <= 0:
+                raise ValueError
+
+            query = query.where(
+                StudentParent.student_id == student_id
+            )
+
+    except ValueError:
+        return jsonify({
+            "success": False,
+            "message": "parent_id and student_id must be positive integers"
+        }), 400
+
+    links = db.session.scalars(query).all()
+    results = []
+
+    for link in links:
+        parent = link.parent
+        student = link.student
+
+        results.append({
+            **link.to_dict(),
+            "parent_name": (
+                parent.user.full_name
+                if parent and parent.user else None
+            ),
+            "student_name": (
+                f"{student.first_name} {student.last_name}".strip()
+                if student else None
+            ),
+            "class_id": student.class_id if student else None
+        })
+
+    return jsonify({
+        "success": True,
+        "count": len(results),
+        "data": results
     }), 200
