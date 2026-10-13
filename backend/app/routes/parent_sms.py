@@ -3,9 +3,13 @@ from decimal import Decimal
 import re
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity
 
 from app.extensions import db
-from app.models import Parent, Student, StudentParent, FeeStructure, Payment
+from app.models import (
+    Parent, Student, StudentParent, FeeStructure, Payment,
+    SmsCampaign, SmsCampaignRecipient,
+)
 from app.utils.auth import role_required
 
 
@@ -346,4 +350,492 @@ def preview_parent_sms_recipients():
         "success": True,
         "message": "Recipient preview generated. No SMS messages were sent.",
         "data": response_data
+    }), 200
+
+
+# ---------------------------------------------------------
+# SMS CAMPAIGN MANAGEMENT
+# ---------------------------------------------------------
+
+SMS_CAMPAIGN_TYPES = {
+    "announcement",
+    "fee_reminder",
+    "parents_meeting",
+    "opening_closing_dates",
+    "custom",
+}
+
+
+def validate_campaign_data(data, existing=None):
+    """Validate campaign fields and return cleaned data or an error."""
+
+    existing = existing or {}
+
+    title = data.get("title", existing.get("title", ""))
+    message = data.get("message", existing.get("message", ""))
+
+    message_type = data.get(
+        "message_type",
+        existing.get("message_type", "announcement"),
+    )
+
+    if not isinstance(title, str) or not title.strip():
+        return None, "A campaign title is required."
+
+    if len(title.strip()) > 200:
+        return None, "The campaign title cannot exceed 200 characters."
+
+    if not isinstance(message, str) or not message.strip():
+        return None, "An SMS message is required."
+
+    if not isinstance(message_type, str):
+        return None, "Invalid campaign message type."
+
+    message_type = message_type.strip().lower()
+
+    if message_type not in SMS_CAMPAIGN_TYPES:
+        return None, (
+            "Invalid message type. Allowed types: "
+            + ", ".join(sorted(SMS_CAMPAIGN_TYPES))
+        )
+
+    raw_class_ids = data.get(
+        "target_class_ids",
+        data.get("class_ids", existing.get("target_class_ids", [])),
+    )
+
+    if raw_class_ids is None:
+        raw_class_ids = []
+
+    if not isinstance(raw_class_ids, list):
+        return None, "target_class_ids must be a list of class IDs."
+
+    class_ids = []
+
+    for value in raw_class_ids:
+        if isinstance(value, bool):
+            return None, "Each class ID must be a positive integer."
+
+        try:
+            class_id = int(value)
+        except (TypeError, ValueError):
+            return None, "Each class ID must be a positive integer."
+
+        if class_id <= 0 or str(value).strip() != str(class_id):
+            return None, "Each class ID must be a positive integer."
+
+        if class_id not in class_ids:
+            class_ids.append(class_id)
+
+    academic_year = data.get(
+        "academic_year",
+        existing.get("academic_year"),
+    )
+
+    if academic_year in ("", None):
+        academic_year = None
+    else:
+        if isinstance(academic_year, bool):
+            return None, "academic_year must be a valid year."
+
+        try:
+            academic_year = int(academic_year)
+        except (TypeError, ValueError):
+            return None, "academic_year must be a valid year."
+
+        if academic_year < 2000 or academic_year > 2100:
+            return None, "academic_year must be between 2000 and 2100."
+
+    term = data.get("term", existing.get("term"))
+
+    if term is not None:
+        if not isinstance(term, str):
+            return None, "term must be text."
+
+        term = term.strip() or None
+
+        if term and len(term) > 50:
+            return None, "term cannot exceed 50 characters."
+
+    if message_type == "fee_reminder":
+        if academic_year is None:
+            return None, "academic_year is required for fee reminders."
+
+        if not term:
+            return None, "term is required for fee reminders."
+
+    return {
+        "title": title.strip(),
+        "message": message.strip(),
+        "message_type": message_type,
+        "target_class_ids": class_ids,
+        "academic_year": academic_year,
+        "term": term,
+    }, None
+
+
+@parent_sms_bp.route("/campaigns", methods=["POST"])
+@role_required("admin")
+def create_sms_campaign():
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "success": False,
+            "message": "A valid JSON request body is required.",
+        }), 400
+
+    cleaned, error = validate_campaign_data(data)
+
+    if error:
+        return jsonify({
+            "success": False,
+            "message": error,
+        }), 400
+
+    try:
+        campaign = SmsCampaign(
+            **cleaned,
+            status="draft",
+            created_by=int(get_jwt_identity()),
+        )
+
+        db.session.add(campaign)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "SMS campaign draft created successfully.",
+            "data": campaign.to_dict(),
+            "sms_sent": False,
+        }), 201
+
+    except (TypeError, ValueError):
+        db.session.rollback()
+
+        return jsonify({
+            "success": False,
+            "message": "The authenticated user ID is invalid.",
+        }), 400
+
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+@parent_sms_bp.route("/campaigns", methods=["GET"])
+@role_required("admin")
+def get_sms_campaigns():
+    status = request.args.get("status", "").strip().lower()
+
+    allowed_statuses = {
+        "draft",
+        "reviewed",
+        "scheduled",
+        "sending",
+        "sent",
+        "failed",
+        "cancelled",
+    }
+
+    if status and status not in allowed_statuses:
+        return jsonify({
+            "success": False,
+            "message": "Invalid campaign status filter.",
+        }), 400
+
+    query = SmsCampaign.query
+
+    if status:
+        query = query.filter_by(status=status)
+
+    campaigns = query.order_by(
+        SmsCampaign.created_at.desc(),
+        SmsCampaign.id.desc(),
+    ).limit(100).all()
+
+    return jsonify({
+        "success": True,
+        "count": len(campaigns),
+        "data": [campaign.to_dict() for campaign in campaigns],
+        "sms_sent": False,
+    }), 200
+
+
+@parent_sms_bp.route("/campaigns/<int:campaign_id>", methods=["GET"])
+@role_required("admin")
+def get_sms_campaign(campaign_id):
+    campaign = db.session.get(SmsCampaign, campaign_id)
+
+    if not campaign:
+        return jsonify({
+            "success": False,
+            "message": "SMS campaign not found.",
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "data": campaign.to_dict(include_recipients=True),
+        "sms_sent": False,
+    }), 200
+
+
+@parent_sms_bp.route("/campaigns/<int:campaign_id>", methods=["PUT"])
+@role_required("admin")
+def update_sms_campaign(campaign_id):
+    campaign = db.session.get(SmsCampaign, campaign_id)
+
+    if not campaign:
+        return jsonify({
+            "success": False,
+            "message": "SMS campaign not found.",
+        }), 404
+
+    if campaign.status != "draft":
+        return jsonify({
+            "success": False,
+            "message": "Only draft campaigns can be edited.",
+        }), 409
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "success": False,
+            "message": "A valid JSON request body is required.",
+        }), 400
+
+    cleaned, error = validate_campaign_data(
+        data,
+        existing={
+            "title": campaign.title,
+            "message": campaign.message,
+            "message_type": campaign.message_type,
+            "target_class_ids": campaign.target_class_ids or [],
+            "academic_year": campaign.academic_year,
+            "term": campaign.term,
+        },
+    )
+
+    if error:
+        return jsonify({
+            "success": False,
+            "message": error,
+        }), 400
+
+    try:
+        for field, value in cleaned.items():
+            setattr(campaign, field, value)
+
+        # A changed draft must not retain an outdated recipient preview.
+        campaign.recipients.clear()
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "SMS campaign draft updated successfully.",
+            "data": campaign.to_dict(),
+            "sms_sent": False,
+        }), 200
+
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+# ---------------------------------------------------------
+# CAMPAIGN RECIPIENT PREVIEW AND SNAPSHOT
+# ---------------------------------------------------------
+
+@parent_sms_bp.route(
+    "/campaigns/<int:campaign_id>/preview",
+    methods=["POST"],
+)
+@role_required("admin")
+def preview_sms_campaign(campaign_id):
+    """
+    Recalculate and save a campaign's eligible recipient snapshot.
+    This endpoint never sends SMS messages.
+    """
+    campaign = db.session.get(SmsCampaign, campaign_id)
+
+    if not campaign:
+        return jsonify({
+            "success": False,
+            "message": "SMS campaign not found.",
+        }), 404
+
+    if campaign.status != "draft":
+        return jsonify({
+            "success": False,
+            "message": "Only draft campaigns can be previewed.",
+        }), 409
+
+    # Validate selected classes before querying recipients.
+    selected_class_ids = campaign.target_class_ids or []
+
+    if selected_class_ids:
+        from app.models import SchoolClass
+
+        existing_class_ids = set(
+            db.session.scalars(
+                db.select(SchoolClass.id).where(
+                    SchoolClass.id.in_(selected_class_ids)
+                )
+            ).all()
+        )
+
+        unknown_class_ids = (
+            set(selected_class_ids) - existing_class_ids
+        )
+
+        if unknown_class_ids:
+            return jsonify({
+                "success": False,
+                "message": "The campaign contains unknown class IDs.",
+                "unknown_class_ids": sorted(unknown_class_ids),
+            }), 400
+
+    if campaign.message_type == "fee_reminder":
+        if campaign.academic_year is None or not campaign.term:
+            return jsonify({
+                "success": False,
+                "message": (
+                    "Fee reminders require an academic year and term."
+                ),
+            }), 400
+
+    # Group parents sharing a phone number, including siblings.
+    recipients = {}
+    invalid_parents = {}
+
+    links = db.session.scalars(
+        db.select(StudentParent)
+    ).all()
+
+    for link in links:
+        parent = link.parent
+        student = link.student
+
+        if not parent or not student:
+            continue
+
+        if (
+            selected_class_ids
+            and student.class_id not in selected_class_ids
+        ):
+            continue
+
+        phone = normalize_kenyan_phone(parent.phone)
+
+        if phone is None:
+            invalid_entry = invalid_parents.setdefault(
+                parent.id,
+                {
+                    "parent_id": parent.id,
+                    "reason": (
+                        "Missing phone number"
+                        if not parent.phone
+                        else "Invalid Kenyan phone number"
+                    ),
+                },
+            )
+            continue
+
+        recipient = recipients.setdefault(
+            phone,
+            {
+                "phone": phone,
+                "parent_ids": set(),
+                "student_ids": set(),
+                "eligibility": "eligible",
+            },
+        )
+
+        recipient["parent_ids"].add(parent.id)
+        recipient["student_ids"].add(student.id)
+
+    # Determine fee eligibility without exposing individual balances.
+    eligible_recipients = []
+    excluded_fee_count = 0
+    incomplete_fee_count = 0
+
+    for phone, recipient in sorted(recipients.items()):
+        if campaign.message_type == "fee_reminder":
+            statuses = []
+
+            for student_id in recipient["student_ids"]:
+                student = db.session.get(Student, student_id)
+
+                statuses.append(
+                    get_student_fee_status(
+                        student,
+                        campaign.academic_year,
+                        campaign.term,
+                    )
+                )
+
+            if "outstanding" in statuses:
+                recipient["eligibility"] = "eligible"
+
+            elif "fee_data_missing" in statuses:
+                recipient["eligibility"] = "fee_data_incomplete"
+                incomplete_fee_count += 1
+                continue
+
+            else:
+                recipient["eligibility"] = "fees_cleared"
+                excluded_fee_count += 1
+                continue
+
+        eligible_recipients.append(recipient)
+
+    # Do not leave a previous snapshot if this preview has no eligible
+    # recipients. Replace the previous draft snapshot transactionally.
+    try:
+        campaign.recipients.clear()
+        db.session.flush()
+
+        for recipient in eligible_recipients:
+            db.session.add(
+                SmsCampaignRecipient(
+                    campaign_id=campaign.id,
+                    phone=recipient["phone"],
+                    parent_ids=sorted(recipient["parent_ids"]),
+                    status="pending",
+                )
+            )
+
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise
+
+    return jsonify({
+        "success": True,
+        "message": (
+            "Campaign recipient preview saved. No SMS messages were sent."
+        ),
+        "data": {
+            "campaign_id": campaign.id,
+            "campaign_title": campaign.title,
+            "message_type": campaign.message_type,
+            "status": campaign.status,
+            "target_class_ids": selected_class_ids,
+            "recipient_count": len(eligible_recipients),
+            "invalid_parent_count": len(invalid_parents),
+            "excluded_fee_cleared_count": excluded_fee_count,
+            "excluded_fee_incomplete_count": incomplete_fee_count,
+            "recipients": [
+                {
+                    "phone": recipient["phone"],
+                    "parent_ids": sorted(recipient["parent_ids"]),
+                    "eligibility": recipient["eligibility"],
+                }
+                for recipient in eligible_recipients
+            ],
+            "sms_sent": False,
+        },
     }), 200

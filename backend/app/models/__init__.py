@@ -37,3 +37,7 @@ __all__ = [
     "Announcement",
     "Notification",
 ]
+
+from .sms_campaign import SmsCampaign, SmsCampaignRecipient
+
+__all__ += ["SmsCampaign", "SmsCampaignRecipient"]
